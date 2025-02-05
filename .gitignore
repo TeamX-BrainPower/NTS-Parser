@@ -136,3 +136,4 @@ dmypy.json
 .idea/
 
 .DS_Store
+model/cc.no.300.bin

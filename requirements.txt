@@ -8,3 +8,6 @@ seaborn
 scikit-learn
 matplotlib
 ipykernel
+transformers
+torch
+fasttext
