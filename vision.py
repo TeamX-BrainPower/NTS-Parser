@@ -1,10 +1,13 @@
 import cv2 as cv
 import mediapipe as mp
 import copy
-import numpy as np
 import itertools
-from draw_utils import *
-
+from draw_utils import (
+    calc_bounding_rect,
+    draw_bounding_rect,
+    draw_landmarks,
+    draw_info_text,
+)
 
 from model import KeyPointClassifier
 
@@ -22,6 +25,7 @@ class Vision:
         static_image_mode: bool = False,
         min_detection_confidence: float = 0.7,
         min_tracking_confidence: float = 0.5,
+        num_threads: int = 1,
     ) -> None:
         self.cap = cv.VideoCapture(cap_device)
         self.cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
@@ -36,10 +40,8 @@ class Vision:
         )
 
         self.keypoint_classifier = KeyPointClassifier(
-            "model/keypoint_classifier.tflite", num_threads=2
+            "model/keypoint_classifier.tflite", num_threads=num_threads
         )
-
-
 
     def calc_landmark_list(self, image, landmarks):
         image_width, image_height = image.shape[1], image.shape[0]
@@ -81,17 +83,44 @@ class Vision:
 
         return temp_landmark_list
 
-
     #
-    def run_frame(self, draw_debug: bool = False) -> None:
+    def run_frame(self, draw_debug: bool = False) -> list[int]:
+        a = [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+            "Æ",
+            "Ø",
+            "Å",
+        ]
 
-        a = ["A", "B", "C"]
-
-        hand_sign_id = None
-
+        hand_sign_id = [-1, -1]
 
         ret, image = self.cap.read()
-        
+
         # if we get no image
         if not ret:
             raise Exception("No image found")
@@ -107,27 +136,27 @@ class Vision:
             for hand_landmarks, handedness in zip(
                 results.multi_hand_landmarks, results.multi_handedness
             ):
-                
                 landmark_list = self.calc_landmark_list(image, hand_landmarks)
-                pre_processed_landmark_list = self.pre_process_landmark(
-                    landmark_list
-                )
+                pre_processed_landmark_list = self.pre_process_landmark(landmark_list)
 
-                hand_sign_id = self.keypoint_classifier(pre_processed_landmark_list)
+                hand_id = self.keypoint_classifier(pre_processed_landmark_list)
 
+                hand = handedness.classification[0].label[0:].lower()
+
+                if hand == "right":
+                    hand_sign_id[0] = hand_id
+                elif hand == "left":
+                    hand_sign_id[1] = hand_id
 
                 if draw_debug:
-
                     brect = calc_bounding_rect(image, hand_landmarks)
 
                     image = draw_bounding_rect(True, image, brect)
                     image = draw_landmarks(image, landmark_list)
-                    image = draw_info_text(
-                        image, brect, handedness, a[hand_sign_id]
-                    )
+                    image = draw_info_text(image, brect, handedness, a[hand_id])
 
         cv.imshow("Test", image)
 
-        return False, hand_sign_id
+        return hand_sign_id
 
     pass

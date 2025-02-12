@@ -22,7 +22,7 @@ class KeyPointClassifier(object):
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
 
-    def __call__(self, landmark_list):
+    def __call__(self, landmark_list) -> int:
         input_details_tensor_index = self.input_details[0]["index"]
         self.interpreter.set_tensor(
             input_details_tensor_index, np.array(
@@ -34,6 +34,6 @@ class KeyPointClassifier(object):
 
         result = self.interpreter.get_tensor(output_details_tensor_index)
 
-        result_index = np.argmax(np.squeeze(result))
+        result_index = int(np.argmax(np.squeeze(result)))
 
         return result_index
