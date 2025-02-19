@@ -1,29 +1,23 @@
-import fasttext
-import fasttext.util
 import os
+from spellchecker import SpellChecker
 
 
 class LLM:
     letters: list[str]
     max_letters: int
-    model: fasttext.FastText._FastText
     norwegian_letters: set[str]
+    spell_checker: SpellChecker
 
     def __init__(
         self,
         max_letters: int = 5,
-        model_path: str = "model/cc.no.300.bin",
         norwegian_path: str = "model/norwegian_words.txt",
     ) -> None:
         print("Starting LLM")
         self.letters = []
         self.max_letters = max_letters
-
-        if not os.path.isfile(model_path):
-            print("Downloading fasttext dataset")
-            fasttext.util.download_model("no", if_exists="ignore")
-            os.rename("cc.no.300.bin", model_path)
-            os.remove("cc.no.300.bin.gz")
+        self.spell_checker = SpellChecker(language=None)
+        self.spell_checker.word_frequency.load_text_file(norwegian_path)
 
         if os.path.isfile(norwegian_path):
             with open(norwegian_path, "r+") as f:
@@ -32,7 +26,6 @@ class LLM:
                 self.norwegian_letters = set(words)
         else:
             self.norwegian_letters = set()
-        self.model = fasttext.load_model(model_path)
 
         pass
 
@@ -40,12 +33,13 @@ class LLM:
         input_text = "".join(self.letters)
         self.letters = []
 
-        if input_text in self.norwegian_letters:
-            return input_text
+        closest_word = self.spell_checker.correction(input_text)
+        closest_words = self.spell_checker.candidates(input_text)
+        print(closest_words)
+        if closest_word is None:
+            return ""
 
-        closest_words = self.model.get_nearest_neighbors(input_text, k=5)
-
-        return closest_words[0][-1]
+        return closest_word[0]
 
     def add_letter(self, letter: str) -> None:
         self.letters.append(letter)

@@ -11,3 +11,4 @@ ipykernel
 transformers
 torch
 fasttext
+pyspellchecker

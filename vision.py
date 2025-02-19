@@ -126,11 +126,13 @@ class Vision:
             raise Exception("No image found")
 
         image = cv.flip(image, 1)
-
+        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         # Get results
         image.flags.writeable = False
         results = self.hands.process(image)
         image.flags.writeable = True
+
+        image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
 
         if results.multi_hand_landmarks is not None:
             for hand_landmarks, handedness in zip(
