@@ -7,39 +7,6 @@ from collections import deque
 import time
 
 
-a = [
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z",
-    "Æ",
-    "Ø",
-    "Å",
-]
-
-
 class App:
     llm: LLM
     v: Vision
@@ -54,6 +21,10 @@ class App:
         draw_debug = True
         last_hand_id: Deque[list[int]] = deque(maxlen=60)
         last_frame_time: float | None = None
+        signs = ["a"] * 39
+
+        with open("model/keypoint_classifier_label.csv", "r+") as f:
+            signs = [a.strip() for a in f.readlines()]
 
         while True:
             key = cv.waitKey(10)
@@ -97,11 +68,11 @@ class App:
                         left_value = left_unique[np.argmax(left_count)]
 
                         if right_value != -1:
-                            val = a[right_value].lower()
+                            val = signs[right_value].lower()
                             print(f"Right hand value: {val}")
                             self.llm.add_letter(val)
                         if left_value != -1:
-                            print(f"Left hand value: {a[left_value]}")
+                            print(f"Left hand value: {signs[left_value]}")
 
                         last_hand_id.clear()
                         last_frame_time = None

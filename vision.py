@@ -16,6 +16,7 @@ class Vision:
     cap: cv.VideoCapture
     hands: mp.solutions.hands.Hands  # pyright: ignore
     keypoint_classifier: KeyPointClassifier
+    signs: list[str]
 
     def __init__(
         self,
@@ -42,6 +43,11 @@ class Vision:
         self.keypoint_classifier = KeyPointClassifier(
             "model/keypoint_classifier.tflite", num_threads=num_threads
         )
+
+        self.signs = ["-1"] * 39
+
+        with open("model/keypoint_classifier_label.csv", "r+") as f:
+            self.signs = [a.strip() for a in f.readlines()]
 
     def calc_landmark_list(self, image, landmarks):
         image_width, image_height = image.shape[1], image.shape[0]
@@ -85,38 +91,6 @@ class Vision:
 
     #
     def run_frame(self, draw_debug: bool = False) -> list[int]:
-        a = [
-            "A",
-            "B",
-            "C",
-            "D",
-            "E",
-            "F",
-            "G",
-            "H",
-            "I",
-            "J",
-            "K",
-            "L",
-            "M",
-            "N",
-            "O",
-            "P",
-            "Q",
-            "R",
-            "S",
-            "T",
-            "U",
-            "V",
-            "W",
-            "X",
-            "Y",
-            "Z",
-            "Æ",
-            "Ø",
-            "Å",
-        ]
-
         hand_sign_id = [-1, -1]
 
         ret, image = self.cap.read()
@@ -155,7 +129,9 @@ class Vision:
 
                     image = draw_bounding_rect(True, image, brect)
                     image = draw_landmarks(image, landmark_list)
-                    image = draw_info_text(image, brect, handedness, a[hand_id])
+                    image = draw_info_text(
+                        image, brect, handedness, self.signs[hand_id]
+                    )
 
         cv.imshow("Test", image)
 
