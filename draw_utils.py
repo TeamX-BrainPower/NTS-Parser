@@ -1,6 +1,8 @@
 import cv2 as cv
 import numpy as np
 
+from PIL import Image, ImageDraw, ImageFont
+
 
 def calc_bounding_rect(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
@@ -358,23 +360,38 @@ def draw_bounding_rect(use_brect, image, brect):
     return image
 
 def draw_info_text(image, brect, handedness, hand_sign_text):
-    cv.rectangle(
-        image, (brect[0], brect[1]), (brect[2], brect[1] - 22), (0, 0, 0), -1
-    )
+    # Convert to PIL image
+    pil_img = Image.fromarray(cv.cvtColor(image, cv.COLOR_BGR2RGB))
+    draw = ImageDraw.Draw(pil_img)
 
-    info_text = handedness.classification[0].label[0:]
-    if hand_sign_text != "":
-        info_text = info_text + ":" + hand_sign_text
-    cv.putText(
-        image,
-        info_text,
-        (brect[0] + 5, brect[1] - 4),
-        cv.FONT_HERSHEY_SIMPLEX,
-        0.6,
-        (255, 255, 255),
-        1,
-        cv.LINE_AA,
-    )
+    # Load font
+    font_path = "font/DejaVuSans.ttf"  
+    font = ImageFont.truetype(font_path, 22)  
+
+    # Prepare text
+    info_text = handedness.classification[0].label
+    if hand_sign_text:
+        info_text += f": {hand_sign_text}" 
+
+    # Calculate text size for colorbox
+    text_size = draw.textbbox((0, 0), info_text, font=font)  # (x0, y0, x1, y1)
+    text_width = text_size[2] - text_size[0]
+    text_height = text_size[3] - text_size[1]
+
+    # Rectangular background
+    rect_x1 = brect[0]
+    rect_y1 = brect[1] - text_height - 10  # Add padding above text
+    rect_x2 = brect[0] + text_width + 10  # Add padding around text
+    rect_y2 = brect[1]
+
+    # Draw background
+    draw.rectangle([(rect_x1, rect_y1), (rect_x2, rect_y2)], fill=(0, 0, 0))
+
+    # Draw the text on top of the rectangle
+    draw.text((brect[0] + 5, rect_y1 + 3), info_text, font=font, fill=(255, 255, 255))
+
+    # Convert back to OpenCV format
+    image = cv.cvtColor(np.array(pil_img), cv.COLOR_RGB2BGR)
 
     return image
 
