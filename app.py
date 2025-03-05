@@ -23,7 +23,7 @@ class App:
         last_frame_time: float | None = None
         signs = ["a"] * 39
 
-        with open("model/keypoint_classifier_label.csv", "r+") as f:
+        with open("model/keypoint_classifier_label.csv", "r+", encoding='utf8') as f:
             signs = [a.strip() for a in f.readlines()]
 
         while True:
@@ -68,11 +68,11 @@ class App:
                         left_value = left_unique[np.argmax(left_count)]
 
                         if right_value != -1:
-                            val = signs[right_value].lower()
+                            val = signs[right_value].strip().lower()[-1]
                             print(f"Right hand value: {val}")
                             self.llm.add_letter(val)
                         if left_value != -1:
-                            print(f"Left hand value: {signs[left_value]}")
+                            print(f"Left hand value: {signs[left_value][-1]}")
 
                         last_hand_id.clear()
                         last_frame_time = None

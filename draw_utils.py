@@ -373,6 +373,7 @@ def draw_info_text(image, brect, handedness, hand_sign_text):
     if hand_sign_text:
         info_text += f": {hand_sign_text}" 
 
+
     # Calculate text size for colorbox
     text_size = draw.textbbox((0, 0), info_text, font=font)  # (x0, y0, x1, y1)
     text_width = text_size[2] - text_size[0]

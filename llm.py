@@ -39,7 +39,7 @@ class LLM:
         if closest_word is None:
             return ""
 
-        return closest_word[0]
+        return closest_word
 
     def add_letter(self, letter: str) -> None:
         self.letters.append(letter)

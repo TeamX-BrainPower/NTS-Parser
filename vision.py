@@ -46,7 +46,7 @@ class Vision:
 
         self.signs = ["-1"] * 39
 
-        with open("model/keypoint_classifier_label.csv", "r+") as f:
+        with open("model/keypoint_classifier_label.csv", "r+", encoding='utf8') as f:
             self.signs = [a.strip() for a in f.readlines()]
 
     def calc_landmark_list(self, image, landmarks):
