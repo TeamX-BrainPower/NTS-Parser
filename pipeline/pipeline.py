@@ -22,9 +22,6 @@ class PipelineManager:
     def process(self, input_data: Any) -> Any:
         data = input_data
         for component in self.pipeline:
-            if data is None:
-                print("data was None")
-                return None
             data = component.process(data)
             if data is None:
                 data = component.get_data()

@@ -2,12 +2,11 @@ from config import ProcessingConfig
 from pipeline import (
     PipelineManager,
     MovementPipeline,
-    DataEnsurerPipeline,
     InterpolationPipeline,
-    LoggerPipeline,
     CollectorPipeline,
     DetectionPipeline,
-    detetion_pipeline,
+    PredictionPipeline,
+    LoggerPipeline,
 )
 
 from mediapipe.tasks.python.vision import RunningMode
@@ -20,21 +19,20 @@ def main():
 
     # pipeline layers
     collector = CollectorPipeline(max_size=300)
-    # data_ensurer = DataEnsurerPipeline()
-    # logger1 = LoggerPipeline()
     movement = MovementPipeline()
     detection = DetectionPipeline()
-    # logger2 = LoggerPipeline()
-    # detection
-    # interpolation = InterpolationPipeline()
-    # predict
+    interpolation = InterpolationPipeline()
+    predict = PredictionPipeline(
+        "model/model_v1.tflite", label_path="model/labels_v1.txt"
+    )
+    logger = LoggerPipeline()
 
     pipeline.add_component(collector)
-    # pipeline.add_component(logger1)
     pipeline.add_component(movement)
     pipeline.add_component(detection)
-    # pipeline.add_component(logger2)
-    # pipeline.add_component(interpolation)
+    pipeline.add_component(interpolation)
+    pipeline.add_component(predict)
+    pipeline.add_component(logger)
 
     config = ProcessingConfig(
         display_output=True,

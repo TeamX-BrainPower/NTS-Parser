@@ -30,8 +30,7 @@ class Processor(ABC):
     def process_video(
         self, image: mp.Image, timestamp: int, world_coords: bool = False
     ) -> tuple[np.ndarray, bool, bool]:
-        results = np.empty((49, 3), dtype=np.float64)
-        results[:] = np.nan
+        results = np.zeros((49, 3), dtype=np.float64)
         hand_result = self.hand_landmarker.detect_for_video(  # pyright: ignore
             image, timestamp
         )
@@ -247,8 +246,7 @@ class Processor(ABC):
         processed_frame = cv.flip(frame, 1)
         processed_frame = cv.cvtColor(processed_frame, cv.COLOR_BGR2RGB)
 
-        mp_image = mp.Image(
-            image_format=mp.ImageFormat.SRGB, data=processed_frame)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=processed_frame)
 
         results = np.zeros((49, 3), dtype=np.float64)
 

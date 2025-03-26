@@ -18,8 +18,6 @@ class MovementPipeline(PipelineComponent):
         if data.shape[0] != velocity.shape[0]:
             velocity = np.vstack([np.zeros((1, velocity.shape[1])), velocity])
 
-        print(velocity[:, 0:3])
-
         acceleration = np.diff(velocity, axis=0) / dt
         while acceleration.shape[0] != data.shape[0]:
             acceleration = np.vstack(

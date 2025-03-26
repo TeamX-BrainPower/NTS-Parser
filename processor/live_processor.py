@@ -34,13 +34,13 @@ class LiveProsessor(Processor):
             self.pose_landmarker,
         ):
             last_timestamp = time()
-            recording_index = 0
-            recording_output = cv.VideoWriter(
-                f"recording_{recording_index}.mp4",
-                cv.VideoWriter_fourcc(*"mp4v"),  # pyright: ignore
-                10,
-                (self.config.cap_width, self.config.cap_height),
-            )
+            # recording_index = 0
+            # recording_output = cv.VideoWriter(
+            #     f"recording_{recording_index}.mp4",
+            #     cv.VideoWriter_fourcc(*"mp4v"),  # pyright: ignore
+            #     10,
+            #     (self.config.cap_width, self.config.cap_height),
+            # )
 
             cv.namedWindow("Test", cv.WINDOW_AUTOSIZE)
             results = None
@@ -55,48 +55,46 @@ class LiveProsessor(Processor):
 
                 if key == 27:
                     break
-                elif key == ord(" "):
-                    if not self.config.recording:
-                        print("Starting recording")
-                        self.config.recording = True
-                    else:
-                        print("finished recording")
-                        self.config.recording = False
-                        recording_output.release()
-                        recording_index += 1
-                        recording_output = cv.VideoWriter(
-                            f"{self.config.output_dir}/recording_{recording_index}.mp4",
-                            cv.VideoWriter_fourcc(*"mp4v"),  # pyright: ignore
-                            10,
-                            (self.config.cap_width, self.config.cap_height),
-                        )
+                # elif key == ord(" "):
+                #     if not self.config.recording:
+                #         print("Starting recording")
+                #         self.config.recording = True
+                #     else:
+                #         print("finished recording")
+                #         self.config.recording = False
+                # recording_output.release()
+                # recording_index += 1
+                # recording_output = cv.VideoWriter(
+                #     f"{self.config.output_dir}/recording_{recording_index}.mp4",
+                #     cv.VideoWriter_fourcc(*"mp4v"),  # pyright: ignore
+                #     10,
+                #     (self.config.cap_width, self.config.cap_height),
+                # )
 
                 timestamp = time()
 
-                print("fps:", 1 / (timestamp - last_timestamp))
+                # print("fps:", 1 / (timestamp - last_timestamp))
 
                 if timestamp <= last_timestamp:
                     timestamp += 0.001
 
                 last_timestamp = timestamp
 
-                results, empty_hands, empty_pose = self.process_frame(
-                    frame, timestamp, False
-                )
+                results, _, _ = self.process_frame(frame, timestamp, False)
 
                 if self.config.pipeline:
                     results = self.config.pipeline.process(results)
 
                 show_frame = cv.flip(show_frame, 1)
                 cv.imshow("Test", show_frame)
-                if self.config.recording:
-                    recording_output.write(show_frame)
+                # if self.config.recording:
+                #     recording_output.write(show_frame)
 
-                if not empty_hands:
-                    print("hands are empty")
-
-                if not empty_pose:
-                    print("pose is empty")
-            recording_output.release()
+                # if not empty_hands:
+                #     print("hands are empty")
+                #
+                # if not empty_pose:
+                #     print("pose is empty")
+            # recording_output.release()
             self.cap.release()
             cv.destroyAllWindows()

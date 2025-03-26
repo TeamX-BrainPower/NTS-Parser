@@ -20,8 +20,13 @@ class LoggerPipeline(PipelineComponent):
             if new_timestamp and old_timestamp:
                 process_time = new_timestamp - old_timestamp
                 print("Process_time:", process_time)
+        elif isinstance(data, tuple):
+            if len(data) == 2:
+                print(f"Predicted: {data[0]} with a probability of {data[1]}")
+        elif data is None:
+            pass
         else:
-            print(type(data))
+            print(type(data), data)
         self.newest_data = data
 
     @override

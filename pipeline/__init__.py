@@ -7,4 +7,5 @@ from .logger_pipeline import LoggerPipeline
 from .movement_pipeline import MovementPipeline
 from .pairwise_pipeline import PairwisePipeline
 from .detetion_pipeline import DetectionPipeline
+from .prediction_pipeline import PredictionPipeline
 # from .recorder_pipeline import RecorderPipeline
